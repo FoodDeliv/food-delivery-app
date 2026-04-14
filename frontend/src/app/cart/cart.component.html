@@ -1,0 +1,25 @@
+<h2>Cart</h2>
+
+<div *ngIf="orders.length === 0">
+  <p>Your cart is empty</p>
+</div>
+
+<div *ngIf="orders.length > 0">
+  <div *ngFor="let order of orders" class="order-box">
+    <p><b>Order ID:</b> {{ order.id }}</p>
+    <p><b>Status:</b> {{ order.status }}</p>
+    <p><b>Created:</b> {{ order.created_at }}</p>
+
+    <div *ngIf="order.items.length === 0">
+      <p>No items in this order</p>
+    </div>
+
+    <div *ngFor="let item of order.items" class="item-box">
+      <p><b>Food:</b> {{ item.food_name }}</p>
+      <p><b>Quantity:</b> {{ item.quantity }}</p>
+      <button (click)="removeItem(item.id)">Remove</button>
+    </div>
+  </div>
+</div>
+
+<button (click)="checkout()">Checkout</button>

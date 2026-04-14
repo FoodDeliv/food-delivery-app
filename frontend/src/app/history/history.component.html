@@ -1,0 +1,16 @@
+<h2>Order History</h2>
+
+<div *ngIf="orders.length === 0">
+  <p>No completed orders yet</p>
+</div>
+
+<div *ngFor="let order of orders" class="order-box">
+  <p><b>Order ID:</b> {{ order.id }}</p>
+  <p><b>Status:</b> {{ order.status }}</p>
+  <p><b>Created:</b> {{ order.created_at }}</p>
+
+  <div *ngFor="let item of order.items" class="item-box">
+    <p><b>Food:</b> {{ item.food_name }}</p>
+    <p><b>Quantity:</b> {{ item.quantity }}</p>
+  </div>
+</div>
