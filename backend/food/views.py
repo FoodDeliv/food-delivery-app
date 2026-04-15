@@ -22,6 +22,30 @@ class FoodItemListAPIView(ListAPIView):
         restaurant_id = self.kwargs['restaurant_id']
         return FoodItem.objects.filter(restaurant_id=restaurant_id)
     
+class FoodItemListCreateAPIView(APIView):
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsAuthenticated()]
+        return [AllowAny()]
+
+    def get(self, request, restaurant_id):
+        foods = FoodItem.objects.filter(restaurant_id=restaurant_id)
+        serializer = FoodItemSerializer(foods, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, restaurant_id):
+        data = request.data.copy()
+        data['restaurant'] = restaurant_id 
+
+        serializer = FoodItemSerializer(data=data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+
+        return Response(serializer.errors, status=400)
+    
 
 class RestaurantListCreateAPIView(APIView):
 

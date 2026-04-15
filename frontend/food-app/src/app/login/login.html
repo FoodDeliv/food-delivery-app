@@ -1,0 +1,34 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <img src="https://avatars.mds.yandex.net/i?id=c6f7aaa24055d03a715b9153f303ee4fc9987352-10964795-images-thumbs&n=13.png" alt="Food App Logo" class="logo">
+    
+    <h1>{{ isLoginMode ? 'Sign In' : 'Sign Up' }}</h1>
+    <p class="subtitle">Favorite food from restaurants in the city</p>
+
+    <div class="form">
+      <div class="input-group" *ngIf="!isLoginMode">
+        <label>Email</label>
+        <input [(ngModel)]="credentials.email" name="email" type="email" placeholder="example@mail.com">
+      </div>
+
+      <div class="input-group">
+        <label>Username</label>
+        <input [(ngModel)]="credentials.username" name="username" type="text" placeholder="Your name">
+      </div>
+
+      <div class="input-group">
+        <label>Password</label>
+        <input [(ngModel)]="credentials.password" name="password" type="password" placeholder="••••••••">
+      </div>
+
+      <button class="main-btn" (click)="onSubmit()">
+        {{ isLoginMode ? 'Sign In' : 'Sign Up' }}
+      </button>
+
+      <p class="toggle-text">
+        {{ isLoginMode ? "Don't have an account?" : "Already have an account?" }}
+        <span (click)="toggleMode()">{{ isLoginMode ? 'Sign Up' : 'Sign In' }}</span>
+      </p>
+    </div>
+  </div>
+</div>
