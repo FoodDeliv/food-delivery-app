@@ -2,6 +2,10 @@
   <div class="auth-card">
     <img src="https://avatars.mds.yandex.net/i?id=c6f7aaa24055d03a715b9153f303ee4fc9987352-10964795-images-thumbs&n=13.png" alt="Food App Logo" class="logo">
     
+    <div *ngIf="message" [ngClass]="messageType === 'success' ? 'msg-success' : 'msg-error'" class="alert-box">
+      {{ message }}
+    </div>
+
     <h1>{{ isLoginMode ? 'Sign In' : 'Sign Up' }}</h1>
     <p class="subtitle">Favorite food from restaurants in the city</p>
 
@@ -18,12 +22,25 @@
 
       <div class="input-group">
         <label>Password</label>
-        <input [(ngModel)]="credentials.password" name="password" type="password" placeholder="••••••••">
+        <div class="password-wrapper">
+          <input 
+            [(ngModel)]="credentials.password" 
+            name="password" 
+            [type]="showPassword ? 'text' : 'password'" 
+            placeholder="••••••••">
+          <span class="toggle-eye" (click)="togglePasswordVisibility()">
+            {{ showPassword ? '🙈' : '👁️' }}
+          </span>
+        </div>
       </div>
 
       <button class="main-btn" (click)="onSubmit()">
         {{ isLoginMode ? 'Sign In' : 'Sign Up' }}
       </button>
+
+      <p class="forgot-password" *ngIf="isLoginMode" (click)="onForgotPassword()">
+        Forgot password?
+      </p>
 
       <p class="toggle-text">
         {{ isLoginMode ? "Don't have an account?" : "Already have an account?" }}

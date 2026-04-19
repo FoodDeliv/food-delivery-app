@@ -93,3 +93,64 @@ h1
     margin-left: 5px
     &:hover
       text-decoration: underline
+
+.alert-box
+  padding: 12px
+  border-radius: 8px
+  margin-bottom: 20px
+  font-size: 14px
+  text-align: center
+  font-weight: 500
+  border: 1px solid transparent
+  animation: slideDown 0.3s ease-out
+
+.msg-success
+  background-color: #f0fff4
+  color: #2f855a
+  border-color: #c6f6d5
+
+.msg-error
+  background-color: #fff5f5
+  color: #c53030
+  border-color: #feb2b2
+
+@keyframes slideDown
+  from
+    opacity: 0
+    transform: translateY(-10px)
+  to
+    opacity: 1
+    transform: translateY(0)
+
+.forgot-password
+  margin-top: 10px
+  font-size: 13px
+  color: #888
+  cursor: pointer
+  text-decoration: none
+  transition: color 0.2s
+
+  &:hover
+    color: #333
+    text-decoration: underline
+    
+.password-wrapper
+  position: relative
+  display: flex
+  align-items: center
+
+  input
+    width: 100%
+    padding-right: 40px // Чтобы текст не залезал на иконку
+
+  .toggle-eye
+    position: absolute
+    right: 12px
+    cursor: pointer
+    user-select: none
+    font-size: 1.2rem
+    opacity: 0.6
+    transition: opacity 0.2s
+
+    &:hover
+      opacity: 1

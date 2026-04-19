@@ -11,6 +11,10 @@ export class ApiService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
+  // НОВЫЙ МЕТОД: Регистрация
+  register(userData: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}register/`, userData);
+  }
 
   login(credentials: any): Observable<any> {
     return this.http.post(`${this.baseUrl}login/`, credentials).pipe(
@@ -35,16 +39,11 @@ export class ApiService {
     return !!this.getToken();
   }
 
-
   getRestaurants(): Observable<any> {
-    return this.http.get(`${this.baseUrl}restaurants/`);
+    return this.http.get(`http://127.0.0.1:8000/food/restaurants/`);
   }
 
-  getFoods(id: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}restaurants/${id}/foods/`);
-  }
-
-  getFood(restaurantId: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}restaurants/${restaurantId}/foods/`);
+  getFoods(restaurantId: number): Observable<any> {
+    return this.http.get(`http://127.0.0.1:8000/food/restaurants/${restaurantId}/foods/`);
   }
 }

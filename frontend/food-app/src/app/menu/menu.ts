@@ -22,7 +22,7 @@ export class Menu implements OnInit {
   ngOnInit() {
     this.restaurantId = Number(this.route.snapshot.paramMap.get('id'));
 
-    this.api.getFood(this.restaurantId).subscribe((data: any) => {
+    this.api.getFoods(this.restaurantId).subscribe((data: any) => {
       this.foods = data;
     });
   }
