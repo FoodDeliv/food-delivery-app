@@ -6,8 +6,8 @@
       {{ message }}
     </div>
 
-    <h1>{{ isLoginMode ? 'Sign In' : 'Sign Up' }}</h1>
-    <p class="subtitle">Favorite food from restaurants in the city</p>
+    <h1>{{ isLoginMode ? t('title_login') : t('title_signup') }}</h1>
+    <p class="subtitle">{{ t('subtitle') }}</p>
 
     <div class="form">
       <div class="input-group" *ngIf="!isLoginMode">
@@ -16,12 +16,12 @@
       </div>
 
       <div class="input-group">
-        <label>Username</label>
+        <label>{{ t('username') }}</label>
         <input [(ngModel)]="credentials.username" name="username" type="text" placeholder="Your name">
       </div>
 
       <div class="input-group">
-        <label>Password</label>
+        <label>{{ t('password') }}</label>
         <div class="password-wrapper">
           <input 
             [(ngModel)]="credentials.password" 
@@ -35,16 +35,16 @@
       </div>
 
       <button class="main-btn" (click)="onSubmit()">
-        {{ isLoginMode ? 'Sign In' : 'Sign Up' }}
+        {{ isLoginMode ? t('title_login') : t('title_signup') }}
       </button>
 
       <p class="forgot-password" *ngIf="isLoginMode" (click)="onForgotPassword()">
-        Forgot password?
+        {{ t('forgot') }}
       </p>
 
       <p class="toggle-text">
-        {{ isLoginMode ? "Don't have an account?" : "Already have an account?" }}
-        <span (click)="toggleMode()">{{ isLoginMode ? 'Sign Up' : 'Sign In' }}</span>
+        {{ isLoginMode ? t('no_account') : t('have_account') }}
+        <span (click)="toggleMode()">{{ isLoginMode ? t('title_signup') : t('title_login') }}</span>
       </p>
     </div>
   </div>

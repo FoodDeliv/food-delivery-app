@@ -20,23 +20,23 @@
     <div class="navbar-center">
       <div class="search-bar">
         <span class="search-icon">🔍</span>
-        <input type="text" placeholder="Find in Deli" class="search-input">
+        <input type="text" [placeholder]="translation.translate('search_placeholder')" class="search-input">
       </div>
     </div>
 
     <div class="navbar-right">
       <div class="lang-selector">
         <span class="lang-icon">🌐</span>
-        <select class="lang-select">
+        <select class="lang-select" (change)="onLangChange($event)" [value]="translation.currentLangValue">
           <option value="ru">RU</option>
           <option value="kz">KZ</option>
           <option value="en">EN</option>
         </select>
       </div>
 
-      <div class="user-controls">
+      <div class="user-controls" *ngIf="isLoggedIn()">
         <button class="logout-btn" (click)="logout()">
-          <span>Sign Out</span>
+          <span>{{ translation.translate('sign_out') }}</span>
         </button>
       </div>
     </div>

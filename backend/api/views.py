@@ -53,7 +53,10 @@ def login(request):
     user = authenticate(username=username, password=password)
 
     if user is None:
-        return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {'detail': 'No active account found with the given credentials'}, 
+            status=status.HTTP_401_UNAUTHORIZED 
+    )
 
     refresh = RefreshToken.for_user(user)
 

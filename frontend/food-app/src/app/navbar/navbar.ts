@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { TranslationService } from '../translation.service';
 
 @Component({
   selector: 'app-navbar',
@@ -14,6 +15,16 @@ export class NavbarComponent {
   selectedCity = 'Алматы';
   isDropdownOpen = false;
 
+  constructor(
+    private router: Router,
+    public translation: TranslationService
+  ) {}
+
+  // Метод для проверки: залогинен ли пользователь?
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('access_token');
+  }
+
   toggleDropdown() {
     this.isDropdownOpen = !this.isDropdownOpen;
   }
@@ -22,7 +33,11 @@ export class NavbarComponent {
     this.selectedCity = city;
     this.isDropdownOpen = false;
   }
-  constructor(private router: Router) {}
+
+  onLangChange(event: any) {
+    const lang = event.target.value;
+    this.translation.setLanguage(lang);
+  }
 
   logout() {
     localStorage.removeItem('access_token'); 

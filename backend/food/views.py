@@ -23,7 +23,6 @@ class FoodItemListAPIView(ListAPIView):
         return FoodItem.objects.filter(restaurant_id=restaurant_id)
     
 class FoodItemListCreateAPIView(APIView):
-
     def get_permissions(self):
         if self.request.method == 'POST':
             return [IsAuthenticated()]
@@ -35,20 +34,17 @@ class FoodItemListCreateAPIView(APIView):
         return Response(serializer.data)
 
     def post(self, request, restaurant_id):
-        data = request.data.copy()
-        data['restaurant'] = restaurant_id 
-
-        serializer = FoodItemSerializer(data=data)
+        # Используем context для передачи дополнительных данных в сериализатор
+        serializer = FoodItemSerializer(data=request.data)
 
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
+            # При сохранении принудительно устанавливаем ID ресторана из URL
+            serializer.save(restaurant_id=restaurant_id) 
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        return Response(serializer.errors, status=400)
-    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class RestaurantListCreateAPIView(APIView):
-
     def get_permissions(self):
         if self.request.method == 'POST':
             return [IsAuthenticated()]
@@ -63,11 +59,12 @@ class RestaurantListCreateAPIView(APIView):
         serializer = RestaurantSerializer(data=request.data)
 
         if serializer.is_valid():
-            serializer.save()
+            # Если поле rating в модели обязательное, но его нет в запросе,
+            # мы можем установить его здесь по умолчанию, если не сделали этого в модели
+            serializer.save() 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 
     
 
