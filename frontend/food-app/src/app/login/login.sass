@@ -1,0 +1,156 @@
+.auth-wrapper
+  height: 100vh
+  display: flex
+  align-items: center
+  justify-content: center
+  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070')
+  background-size: cover
+  background-position: center
+
+.auth-card
+  background: white
+  padding: 40px
+  border-radius: 24px
+  width: 100%
+  max-width: 420px
+  text-align: center
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2)
+
+.logo
+  display: block
+  margin: 0 auto 20px 
+  
+  max-height: 85px  
+  width: auto
+  
+  mix-blend-mode: multiply 
+  object-fit: contain
+  transition: transform 0.3s ease
+
+  &:hover
+    transform: scale(1.05)
+
+h1
+  font-size: 26px 
+  font-weight: 700
+  margin-top: 0
+  margin-bottom: 5px 
+  color: #111
+
+.subtitle
+  color: #646464
+  font-size: 15px
+  margin-bottom: 30px
+
+.input-group
+  text-align: left
+  margin-bottom: 20px
+  
+  label
+    display: block
+    font-size: 14px
+    font-weight: 600
+    margin-bottom: 8px
+    color: #333
+    
+  input
+    width: 100%
+    padding: 14px
+    border: 1px solid #e2e2e2
+    border-radius: 12px
+    font-size: 16px
+    outline: none
+    transition: all 0.2s
+    
+    &:focus
+      border-color: #009de0
+      box-shadow: 0 0 0 3px rgba(0, 157, 224, 0.1)
+
+.main-btn
+  width: 100%
+  padding: 16px
+  background: #009de0 // Фирменный голубой Wolt
+  color: white
+  border: none
+  border-radius: 12px
+  font-size: 16px
+  font-weight: 700
+  cursor: pointer
+  transition: background 0.2s
+  
+  &:hover
+    background: #007bb0
+
+.toggle-text
+  margin-top: 24px
+  font-size: 14px
+  color: #646464
+  
+  span
+    color: #009de0
+    cursor: pointer
+    font-weight: 600
+    margin-left: 5px
+    &:hover
+      text-decoration: underline
+
+.alert-box
+  padding: 12px
+  border-radius: 8px
+  margin-bottom: 20px
+  font-size: 14px
+  text-align: center
+  font-weight: 500
+  border: 1px solid transparent
+  animation: slideDown 0.3s ease-out
+
+.msg-success
+  background-color: #f0fff4
+  color: #2f855a
+  border-color: #c6f6d5
+
+.msg-error
+  background-color: #fff5f5
+  color: #c53030
+  border-color: #feb2b2
+
+@keyframes slideDown
+  from
+    opacity: 0
+    transform: translateY(-10px)
+  to
+    opacity: 1
+    transform: translateY(0)
+
+.forgot-password
+  margin-top: 10px
+  font-size: 13px
+  color: #888
+  cursor: pointer
+  text-decoration: none
+  transition: color 0.2s
+
+  &:hover
+    color: #333
+    text-decoration: underline
+    
+.password-wrapper
+  position: relative
+  display: flex
+  align-items: center
+
+  input
+    width: 100%
+    padding-right: 40px // Чтобы текст не залезал на иконку
+
+  .toggle-eye
+    position: absolute
+    right: 12px
+    cursor: pointer
+    user-select: none
+    font-size: 1.2rem
+    opacity: 0.6
+    transition: opacity 0.2s
+
+    &:hover
+      opacity: 1

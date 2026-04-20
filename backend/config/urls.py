@@ -18,7 +18,12 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
+
     path('admin/', admin.site.urls),
     path('api/', include('food.urls')),
     path('api/', include('orders.urls')),
+    path("admin/", admin.site.urls),
+    path('api/auth/', include('api.urls')), # Теперь для логина будет /api/auth/login/
+    path('api/food/', include('food.urls')), # Теперь для еды будет /api/food/restaurants/
+
 ]

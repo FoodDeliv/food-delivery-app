@@ -1,0 +1,65 @@
+.notification-container
+  position: fixed
+  bottom: 40px
+  left: 50%
+  transform: translateX(-50%)
+  z-index: 9999
+  pointer-events: none // Чтобы не мешало кликам, если перекрывает кнопки
+
+.snackbar
+  min-width: 320px
+  background: #1a1a1a
+  color: white
+  padding: 16px 20px
+  border-radius: 20px
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2)
+  display: flex
+  flex-direction: column
+  overflow: hidden
+  animation: slideUp 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28)
+
+  &.error
+    border-left: 4px solid #ff453a
+    .icon
+      color: #ff453a
+
+  &.success
+    border-left: 4px solid #32d74b
+
+  .content
+    display: flex
+    align-items: center
+    gap: 12px
+
+    .icon
+      font-size: 20px
+
+    .message
+      margin: 0
+      font-size: 14px
+      font-weight: 500
+      letter-spacing: -0.2px
+
+  // Полоска таймера снизу
+  .progress-bar
+    position: absolute
+    bottom: 0
+    left: 0
+    height: 3px
+    background: rgba(255, 255, 255, 0.2)
+    width: 100%
+    animation: shrink 2s linear forwards
+
+@keyframes slideUp
+  0%
+    transform: translateY(100px)
+    opacity: 0
+  100%
+    transform: translateY(0)
+    opacity: 1
+
+@keyframes shrink
+  from
+    width: 100%
+  to
+    width: 0%

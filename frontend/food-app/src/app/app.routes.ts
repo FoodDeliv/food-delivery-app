@@ -1,8 +1,17 @@
 import { Routes } from '@angular/router';
 import { Restaurants } from './restaurants/restaurants';
-import { Menu } from './menu/menu';
+import { RestaurantMenuComponent } from './restaurant-menu/restaurant-menu';
+import { LoginComponent } from './login/login';
+import { SearchResultsComponent } from './search-results/search-results'; // Добавили импорт
 
 export const routes: Routes = [
-  { path: '', component: Restaurants },
-  { path: 'menu/:id', component: Menu }
+  { path: 'login', component: LoginComponent },
+  { path: 'restaurants', component: Restaurants },
+  { path: 'menu/:id', component: RestaurantMenuComponent },
+  
+  { path: 'search', component: SearchResultsComponent },
+
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  
+  { path: '**', redirectTo: 'login' }
 ];
