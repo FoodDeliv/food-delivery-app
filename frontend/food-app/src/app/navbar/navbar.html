@@ -2,7 +2,7 @@
   <div class="navbar-content">
     
     <div class="navbar-left">
-      <img src="https://avatars.mds.yandex.net/i?id=c6f7aaa24055d03a715b9153f303ee4fc9987352-10964795-images-thumbs&n=13.png" alt="Logo" class="nav-logo">
+      <img src="https://avatars.mds.yandex.net/i?id=c6f7aaa24055d03a715b9153f303ee4fc9987352-10964795-images-thumbs&n=13.png" alt="Logo" class="nav-logo" (click)="router.navigate(['/'])" style="cursor: pointer;">
       
       <div class="location-selector" (click)="toggleDropdown()">
         <span>📍</span>
@@ -18,9 +18,27 @@
     </div>
 
     <div class="navbar-center">
-      <div class="search-bar">
-        <span class="search-icon">🔍</span>
-        <input type="text" [placeholder]="translation.translate('search_placeholder')" class="search-input">
+      <div class="search-bar-container">
+        <div class="search-bar">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            [formControl]="searchControl"
+            [placeholder]="translation.translate('search_placeholder')" 
+            class="search-input"
+            (keyup.enter)="onSearchSubmit()"
+          >
+        </div>
+        
+        <div class="search-suggestions" *ngIf="suggestions.length > 0">
+          <div 
+            class="suggestion-item" 
+            *ngFor="let item of suggestions" 
+            (click)="onSearchSubmit(item)"
+          >
+            {{ item }}
+          </div>
+        </div>
       </div>
     </div>
 
@@ -40,6 +58,5 @@
         </button>
       </div>
     </div>
-
   </div>
 </nav>

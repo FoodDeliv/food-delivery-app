@@ -1,26 +1,53 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TranslationService } from '../translation.service';
+import { FoodService } from '../services/food.service';
+import { debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './navbar.html',
   styleUrl: './navbar.sass'
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   cities = ['Алматы', 'Астана', 'Шымкент', 'Караганда', 'Актобе', 'Тараз', 'Aктау'];
   selectedCity = 'Алматы';
   isDropdownOpen = false;
 
+  // Контрол для поиска и массив подсказок
+  searchControl = new FormControl('');
+  suggestions: string[] = [];
+
   constructor(
-    private router: Router,
-    public translation: TranslationService
+    public router: Router,
+    public translation: TranslationService,
+    private foodService: FoodService
   ) {}
 
-  // Метод для проверки: залогинен ли пользователь?
+  ngOnInit(): void {
+    // Логика живого поиска
+    this.searchControl.valueChanges.pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      switchMap(query => {
+        if (query && query.length >= 2) {
+          return this.foodService.getSuggestions(query);
+        }
+        return of([]);
+      })
+    ).subscribe({
+      next: (data) => {
+        this.suggestions = data;
+        console.log('Подсказки:', data);
+      },
+      error: (err) => console.error('Ошибка поиска:', err)
+    });
+  }
+
   isLoggedIn(): boolean {
     return !!localStorage.getItem('access_token');
   }
@@ -37,6 +64,15 @@ export class NavbarComponent {
   onLangChange(event: any) {
     const lang = event.target.value;
     this.translation.setLanguage(lang);
+  }
+
+  // Срабатывает при нажатии Enter или выборе из списка
+  onSearchSubmit(query?: string) {
+    const finalQuery = query || this.searchControl.value;
+    if (finalQuery) {
+      this.suggestions = []; // Скрываем подсказки
+      this.router.navigate(['/search'], { queryParams: { q: finalQuery } });
+    }
   }
 
   logout() {

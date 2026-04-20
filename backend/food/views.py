@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.db.models import Q
 
 
 
@@ -104,3 +105,34 @@ class RestaurantDetailAPIView(APIView):
         restaurant.delete()
         return Response({"message": "Deleted successfully"}, status=204)
     
+class SearchSuggestionsAPIView(APIView):
+    def get(self, request):
+        query = request.GET.get('q', '')
+        if len(query) < 2:
+            return Response([])
+        
+        # Ищем совпадения в названиях ресторанов и блюд
+        restaurants = Restaurant.objects.filter(name__icontains=query).values_list('name', flat=True)
+        foods = FoodItem.objects.filter(name__icontains=query).values_list('name', flat=True)
+        
+        suggestions = list(restaurants) + list(foods)
+        return Response(list(set(suggestions))[:5])
+    
+class GlobalSearchAPIView(APIView):
+    def get(self, request):
+        query = request.GET.get('q', '')
+        if not query:
+            return Response({"restaurants": [], "foods": []})
+
+        # Ищем рестораны по названию или описанию
+        restaurants = Restaurant.objects.filter(
+            Q(name__icontains=query) | Q(description__icontains=query)
+        )
+        
+        # Ищем блюда по названию
+        foods = FoodItem.objects.filter(name__icontains=query)
+
+        return Response({
+            "restaurants": RestaurantSerializer(restaurants, many=True).data,
+            "foods": FoodItemSerializer(foods, many=True).data
+        })

@@ -3,3 +3,13 @@
 <main>
   <router-outlet></router-outlet>
 </main>
+
+<div class="notification-container" *ngIf="notification$ | async as note">
+  <div class="snackbar" [ngClass]="note.type">
+    <div class="content">
+      <span class="icon">{{ note.type === 'error' ? '🚫' : '✅' }}</span>
+      <p class="message">{{ note.message }}</p>
+    </div>
+    <div class="progress-bar"></div>
+  </div>
+</div>
