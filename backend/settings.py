@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
-import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,16 +31,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-<<<<<<< HEAD
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'corsheaders',
-    'food',
-=======
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -52,21 +41,9 @@ INSTALLED_APPS = [
     'rest_framework',
     "rest_framework_simplejwt",
     "api",                      
->>>>>>> 9e5c6dc834bc0a38655557944517bd879b49b812
 ]
+
 MIDDLEWARE = [
-<<<<<<< HEAD
-    'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',         
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
-ROOT_URLCONF = 'backend.urls'
-=======
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -77,7 +54,6 @@ ROOT_URLCONF = 'backend.urls'
 ]
 
 ROOT_URLCONF = "config.urls"
->>>>>>> 9e5c6dc834bc0a38655557944517bd879b49b812
 
 TEMPLATES = [
     {
@@ -150,20 +126,8 @@ REST_FRAMEWORK = {
     )
 }
 
-<<<<<<< HEAD
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-CORS_REPLACE_HTTPS_REFERER = True
-CORS_ALLOW_ALL_ORIGINS = True  
-CORS_ALLOW_METHODS = ["GET", "POST", "OPTIONS", "PUT", "DELETE"]
-CORS_ALLOW_HEADERS = ["*"]
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-=======
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 print("🔥 SETTINGS LOADEDккккк")
->>>>>>> 9e5c6dc834bc0a38655557944517bd879b49b812
