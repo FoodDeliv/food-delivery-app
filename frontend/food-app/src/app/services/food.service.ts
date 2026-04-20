@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { map, catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FoodService {
-  // Вручную добавленные данные для работы без бэкенда
+  private apiUrl = 'http://127.0.0.1:8000/api/food';
+
   private mockData = {
     restaurants: [
         { id: 1, name: 'Bahandi', rating: 4.6, description: 'Лучшие бургеры в городе', is_open: true, imageUrl: 'https://merey.kz/storage/establishments/July2024/ZZ3ZMwllKAs4covwtb11.jpg' },
@@ -82,7 +84,15 @@ export class FoodService {
     ]
   };
 
-  getAll(): Observable<any> {
+ constructor(private http: HttpClient) { }
+
+  
+  private isAuthorized(): boolean {
+    return !!localStorage.getItem('access_token');
+  }
+
+  // Локальный mock как fallback
+  private getMockAll(): Observable<any> {
     const foods = this.mockData.foods.map(f => ({
       ...f,
       restaurantName: this.mockData.restaurants.find(r => r.id === f.restId)?.name || 'Ресторан'
@@ -90,7 +100,26 @@ export class FoodService {
     return of({ restaurants: this.mockData.restaurants, foods });
   }
 
-  constructor() { }
+  // ИСПРАВЛЕНО: авторизованный → бэкенд с fallback на mock при ошибке сети/пустой БД
+  getAll(): Observable<any> {
+    if (this.isAuthorized()) {
+      return this.http.get<any[]>(`${this.apiUrl}/restaurants/`).pipe(
+        map(res => {
+          // Если бэкенд вернул пустой массив — используем mock
+          if (!res || (res as any[]).length === 0) {
+            const foods = this.mockData.foods.map(f => ({
+              ...f,
+              restaurantName: this.mockData.restaurants.find(r => r.id === f.restId)?.name || 'Ресторан'
+            }));
+            return { restaurants: this.mockData.restaurants, foods };
+          }
+          return { restaurants: res, foods: [] };
+        }),
+        catchError(() => this.getMockAll()) // При ошибке бэкенда — mock
+      );
+    }
+    return this.getMockAll();
+  }
 
   getSuggestions(query: string): Observable<string[]> {
     const q = query.toLowerCase();
@@ -102,37 +131,62 @@ export class FoodService {
     return of(filtered.slice(0, 5)); 
   }
 
-  getRestaurantById(id: number): Observable<any> {
-  const restaurant = this.mockData.restaurants.find(r => r.id === id);
-  return of(restaurant);
+  // ИСПРАВЛЕНО: бэкенд с fallback на mock при ошибке
+  getRestaurantById(id: number | string): Observable<any> {
+    if (this.isAuthorized()) {
+      return this.http.get(`${this.apiUrl}/restaurants/${id}/`).pipe(
+        catchError(() => {
+          const restaurant = this.mockData.restaurants.find(r => r.id === Number(id));
+          return of(restaurant);
+        })
+      );
+    }
+    const restaurant = this.mockData.restaurants.find(r => r.id === Number(id));
+    return of(restaurant);
   }
 
-    getFoodsByRestaurant(restId: number): Observable<any[]> {
-    const foods = this.mockData.foods.filter(f => f.restId === restId);
+  // ИСПРАВЛЕНО: бэкенд с fallback на mock при ошибке или пустом результате
+  getFoodsByRestaurant(restId: number | string): Observable<any[]> {
+    if (this.isAuthorized()) {
+      return this.http.get<any[]>(`${this.apiUrl}/restaurants/${restId}/foods/`).pipe(
+        map(res => {
+          // Если бэкенд вернул пустой массив — используем mock
+          if (!res || (res as any[]).length === 0) {
+            return this.mockData.foods.filter(f => f.restId === Number(restId));
+          }
+          return res;
+        }),
+        catchError(() => {
+          const foods = this.mockData.foods.filter(f => f.restId === Number(restId));
+          return of(foods);
+        })
+      );
+    }
+    const foods = this.mockData.foods.filter(f => f.restId === Number(restId));
     return of(foods);
-    }   
+  }
 
   globalSearch(query: string): Observable<any> {
-  const q = query.toLowerCase();
+    const q = query.toLowerCase();
 
-  const foundRestaurants = this.mockData.restaurants.filter(r => 
-    r.name.toLowerCase().includes(q)
-  );
+    // Поиск всегда можно оставить по локальным данным для мгновенного отклика (Find in Deli)
+    const foundRestaurants = this.mockData.restaurants.filter(r => 
+      r.name.toLowerCase().includes(q)
+    );
 
-  const foundFoods = this.mockData.foods
-    .filter(f => f.name.toLowerCase().includes(q))
-    .map(food => {
-      // Ищем ресторан по его ID
-      const restaurant = this.mockData.restaurants.find(r => r.id === food.restId);
-      return {
-        ...food,
-        restaurantName: restaurant ? restaurant.name : 'Неизвестный ресторан'
-      };
+    const foundFoods = this.mockData.foods
+      .filter(f => f.name.toLowerCase().includes(q))
+      .map(food => {
+        const restaurant = this.mockData.restaurants.find(r => r.id === food.restId);
+        return {
+          ...food,
+          restaurantName: restaurant ? restaurant.name : 'Неизвестный ресторан'
+        };
+      });
+
+    return of({
+      restaurants: foundRestaurants,
+      foods: foundFoods
     });
-
-  return of({
-    restaurants: foundRestaurants,
-    foods: foundFoods
-  });
-}
+  }
 }

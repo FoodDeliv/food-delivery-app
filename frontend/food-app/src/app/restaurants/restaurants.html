@@ -1,27 +1,56 @@
-<div class="container" style="padding: 20px; font-family: sans-serif;">
-  <h1>Список ресторанов</h1>
+<div class="main-container">
+  
+  <header class="hero-section">
+    <h1>Привет, Бека! 👋</h1>
+    <p>Что закажем сегодня?</p>
+  </header>
 
-  <div *ngIf="restaurants.length > 0; else loading">
-    <div class="grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
-      
-      <div *ngFor="let r of restaurants" 
-           style="border: 1px solid #ddd; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background: white;">
-        <h2 style="margin: 0 0 10px 0; color: #2c3e50;">{{ r.name }}</h2>
-        <p style="color: #7f8c8d; font-size: 0.9em;">{{ r.description }}</p>
-        <p style="font-weight: bold; color: #f1c40f;">⭐ {{ r.rating }}</p>
-        
-        <button (click)="openMenu(r.id)" 
-                style="width: 100%; background: #e74c3c; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: background 0.3s;">
-          View Menu
-        </button>
-      </div>
-
+  <section class="food-showcase">
+    <div class="section-header">
+      <h2>Популярное сейчас</h2>
+      <button class="view-all">Все блюда</button>
     </div>
-  </div>
+    
+    <div class="food-scroll">
+      <div class="food-card-modern" *ngFor="let food of allFoods">
+        <div class="food-image-wrapper">
+          <img [src]="food.image || 'assets/default-food.png'" alt="food">
+          <span class="price-tag">{{ food.price }} ₸</span>
+        </div>
+        <div class="food-details">
+          <h3>{{ food.name }}</h3>
+          <button class="add-btn" (click)="addToCart(food)">
+            <span>+</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="restaurants-list">
+    <div class="section-header">
+      <h2>Рестораны рядом</h2>
+    </div>
+
+    <div class="restaurants-grid" *ngIf="restaurants.length > 0; else loading">
+      <div class="res-card" *ngFor="let r of restaurants" (click)="openMenu(r.id)">
+        <div class="res-banner">
+          <img [src]="r.image" alt="restaurant">
+          <div class="res-rating">⭐ {{ r.rating }}</div>
+        </div>
+        <div class="res-info">
+          <h3>{{ r.name }}</h3>
+          <p>{{ r.description }}</p>
+          <div class="res-meta">
+            <span class="delivery-time">30-45 мин</span>
+            <span class="delivery-fee">• Бесплатная доставка</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <ng-template #loading>
-    <div style="text-align: center; margin-top: 50px;">
-      <p style="font-size: 1.2em; color: #95a5a6;">Загрузка вкусных мест...</p>
-    </div>
+    <div class="loader">Ищем лучшие места...</div>
   </ng-template>
 </div>

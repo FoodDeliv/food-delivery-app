@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.db.models import Q
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
@@ -29,7 +30,6 @@ def register(request):
         )
 
     try:
-        # Создаем пользователя через встроенный метод Django
         User.objects.create_user(username=username, password=password, email=email)
         return Response(
             {'message': 'User created successfully'}, 
@@ -46,6 +46,7 @@ def register(request):
 def login(request):
     """
     FBV для авторизации и получения JWT токенов.
+    Возвращает access, refresh, username и email пользователя.
     """
     username = request.data.get('username')
     password = request.data.get('password')
@@ -60,9 +61,12 @@ def login(request):
 
     refresh = RefreshToken.for_user(user)
 
+    # ИСПРАВЛЕНО: добавляем username и email в ответ
     return Response({
         'access': str(refresh.access_token),
-        'refresh': str(refresh)
+        'refresh': str(refresh),
+        'username': user.username,
+        'email': user.email,
     })
 
 @api_view(['GET'])
@@ -76,4 +80,3 @@ def profile(request):
         "user": request.user.username,
         "email": request.user.email
     })
-

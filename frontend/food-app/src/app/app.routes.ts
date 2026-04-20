@@ -1,36 +1,17 @@
 import { Routes } from '@angular/router';
-<<<<<<< HEAD
-import { Restaurants } from './restaurants/restaurants'; 
-import { Menu } from './menu/menu';
-
-export const routes: Routes = [
-  { 
-    path: '', 
-    component: Restaurants 
-  },
-  { 
-    path: 'menu/:id', 
-    component: Menu 
-  },
-  { 
-    path: '**', 
-    redirectTo: '' 
-  } 
-=======
 import { Restaurants } from './restaurants/restaurants';
-import { RestaurantMenuComponent } from './restaurant-menu/restaurant-menu';
+import { Menu } from './menu/menu';
 import { LoginComponent } from './login/login';
-import { SearchResultsComponent } from './search-results/search-results'; // Добавили импорт
+import { SearchResultsComponent } from './search-results/search-results';
+import { RestaurantMenuComponent } from './restaurant-menu/restaurant-menu';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'restaurants', component: Restaurants },
-  { path: 'menu/:id', component: RestaurantMenuComponent },
-  
+  { path: 'menu/:id', component: Menu },
+  // ИСПРАВЛЕНО: добавлен маршрут для компонента restaurant-menu (был пропущен при слиянии)
+  { path: 'restaurant/:id', component: RestaurantMenuComponent },
   { path: 'search', component: SearchResultsComponent },
-
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
-  
-  { path: '**', redirectTo: 'login' }
->>>>>>> 9e5c6dc834bc0a38655557944517bd879b49b812
+  { path: '', redirectTo: 'restaurants', pathMatch: 'full' },
+  { path: '**', redirectTo: 'restaurants' }
 ];
