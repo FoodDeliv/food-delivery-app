@@ -1,15 +1,14 @@
 from pathlib import Path
 import os
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "django-insecure-v8n4%oarf#^9srpsgbtrw$7#!1p1^vagzjm6$0lzsa8$e+3nc-"
 
 DEBUG = True
-
 ALLOWED_HOSTS = []
 
+# ✅ APPS (объединено)
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -17,27 +16,21 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-<<<<<<< HEAD
-    'food',
-    'rest_framework',
-    'api',
-    'django_filters',
-    'corsheaders',
-]
 
-MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-=======
+    # third-party
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
+    "django_filters",
+
+    # your apps
     "food",
     "api",
 ]
 
+# ✅ MIDDLEWARE (объединено)
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
->>>>>>> 9e5c6dc834bc0a38655557944517bd879b49b812
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -47,12 +40,17 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# ✅ CORS (твоя часть)
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",
     "http://127.0.0.1:4200",
 ]
 
-CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+CORS_ALLOW_HEADERS = ["*"]
 
 ROOT_URLCONF = "config.urls"
 
@@ -94,15 +92,11 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-<<<<<<< HEAD
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_METHODS = ["GET", "POST", "OPTIONS", "PUT", "DELETE"]
-CORS_ALLOW_HEADERS = ["*"]
-
-
+# ✅ MEDIA (твоя часть)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-=======
+
+# ✅ DRF + JWT (очень важно для тебя)
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -114,6 +108,3 @@ SIMPLE_JWT = {
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-print("🔥 SETTINGS LOADED & CORS CONFIGURED")
->>>>>>> 9e5c6dc834bc0a38655557944517bd879b49b812
