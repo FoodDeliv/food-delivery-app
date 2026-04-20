@@ -1,5 +1,23 @@
+<<<<<<< HEAD
 <nav>
   <h1>RestoApp</h1>
 </nav>
 
 <router-outlet></router-outlet>
+=======
+<app-navbar></app-navbar>
+
+<main>
+  <router-outlet></router-outlet>
+</main>
+
+<div class="notification-container" *ngIf="notification$ | async as note">
+  <div class="snackbar" [ngClass]="note.type">
+    <div class="content">
+      <span class="icon">{{ note.type === 'error' ? '🚫' : '✅' }}</span>
+      <p class="message">{{ note.message }}</p>
+    </div>
+    <div class="progress-bar"></div>
+  </div>
+</div>
+>>>>>>> 9e5c6dc834bc0a38655557944517bd879b49b812

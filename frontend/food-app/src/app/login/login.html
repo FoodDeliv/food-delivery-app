@@ -1,0 +1,51 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <img src="https://avatars.mds.yandex.net/i?id=c6f7aaa24055d03a715b9153f303ee4fc9987352-10964795-images-thumbs&n=13.png" alt="Food App Logo" class="logo">
+    
+    <div *ngIf="message" [ngClass]="messageType === 'success' ? 'msg-success' : 'msg-error'" class="alert-box">
+      {{ message }}
+    </div>
+
+    <h1>{{ isLoginMode ? t('title_login') : t('title_signup') }}</h1>
+    <p class="subtitle">{{ t('subtitle') }}</p>
+
+    <div class="form">
+      <div class="input-group" *ngIf="!isLoginMode">
+        <label>Email</label>
+        <input [(ngModel)]="credentials.email" name="email" type="email" placeholder="example@mail.com">
+      </div>
+
+      <div class="input-group">
+        <label>{{ t('username') }}</label>
+        <input [(ngModel)]="credentials.username" name="username" type="text" placeholder="Your name">
+      </div>
+
+      <div class="input-group">
+        <label>{{ t('password') }}</label>
+        <div class="password-wrapper">
+          <input 
+            [(ngModel)]="credentials.password" 
+            name="password" 
+            [type]="showPassword ? 'text' : 'password'" 
+            placeholder="••••••••">
+          <span class="toggle-eye" (click)="togglePasswordVisibility()">
+            {{ showPassword ? '🙈' : '👁️' }}
+          </span>
+        </div>
+      </div>
+
+      <button class="main-btn" (click)="onSubmit()">
+        {{ isLoginMode ? t('title_login') : t('title_signup') }}
+      </button>
+
+      <p class="forgot-password" *ngIf="isLoginMode" (click)="onForgotPassword()">
+        {{ t('forgot') }}
+      </p>
+
+      <p class="toggle-text">
+        {{ isLoginMode ? t('no_account') : t('have_account') }}
+        <span (click)="toggleMode()">{{ isLoginMode ? t('title_signup') : t('title_login') }}</span>
+      </p>
+    </div>
+  </div>
+</div>

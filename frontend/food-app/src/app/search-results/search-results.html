@@ -1,0 +1,90 @@
+<div class="search-page-wrapper">
+  <div class="container">
+    
+    <header class="search-header" *ngIf="query">
+      <h1 class="search-title">
+        {{ query }}
+        <span class="results-count" *ngIf="!isLoading">
+          — найдено {{ getTotalCount() }} 
+        </span>
+      </h1>
+    </header>
+
+    <div class="loader" *ngIf="isLoading">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="results-content" *ngIf="!isLoading">
+      
+      <section class="results-section" *ngIf="results.restaurants.length > 0">
+        <h2 class="section-label">Рестораны</h2>
+        <div class="restaurants-list">
+          <div class="restaurant-card-premium" *ngFor="let rest of results.restaurants" [routerLink]="['/menu', rest.id]">
+            <div class="rest-logo">
+                 <img [src]="rest.imageUrl" [alt]="rest.name" onerror="this.src='assets/images/default-rest.png'">
+            </div>
+            <div class="rest-data">
+              <div class="top-row">
+                <h3>{{ rest.name }}</h3>
+                <span class="rating-badge">⭐ {{ rest.rating || '0.0' }}</span>
+              </div>
+              <p class="description">{{ rest.description }}</p>
+              <div class="footer-row">
+                <span class="status-tag" [class.is-closed]="!rest.is_open">
+                  {{ rest.is_open ? 'Открыто' : 'Закрыто' }}
+                </span>
+                <span class="delivery-info">30–45 мин • Бесплатная доставка</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="results-section" *ngIf="results.foods.length > 0">
+        <h2 class="section-label">Блюда</h2>
+        <div class="food-grid">
+          <div class="food-card-modern" *ngFor="let food of results.foods">
+            <div class="image-wrapper">
+             <div class="food-placeholder">
+                    <img [src]="food.imageUrl" [alt]="food.name" onerror="this.src='assets/images/default-food.png'">
+             </div>
+              <button class="quick-add" (click)="addToCart(food)">+</button>
+            </div>
+            <div class="food-content">
+              <div class="price-row">
+                <span class="current-price">{{ food.price }} ₸</span>
+              </div>
+              <h4 class="food-name">{{ food.name }}</h4>
+              
+              <p class="food-restaurant" *ngIf="food.restaurantName">от {{ food.restaurantName }}</p>
+              
+              <p class="food-weight">{{ food.weight || '330 г' }}</p>
+
+              <div class="food-actions">
+                <button class="add-to-cart-btn" *ngIf="!cartCounts[food.id]" (click)="addToCart(food)">
+                  Добавить
+                </button>
+
+                <div class="counter-control" *ngIf="cartCounts[food.id] > 0">
+                  <button class="count-btn" (click)="removeFromCart(food)">−</button>
+                  <span class="count-value">{{ cartCounts[food.id] }}</span>
+                  <button class="count-btn" (click)="addToCart(food)">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="empty-state" *ngIf="getTotalCount() === 0">
+        <div class="empty-icon">🤷‍♂️</div>
+            <h2 class="empty-title">Ничего не найдено</h2>
+        <p>Но у нас есть много другого вкусного!</p>
+        <div class="empty-actions">
+            <button class="view-all-btn" (click)="query = ''; fetchResults()">Посмотреть все товары</button>
+        </div>
+    </div>
+
+    </div>
+  </div>
+</div>

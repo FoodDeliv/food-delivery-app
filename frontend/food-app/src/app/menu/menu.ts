@@ -2,14 +2,23 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // 1. До
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ApiService } from '../api.service';
+<<<<<<< HEAD
 import { CartService } from '../cart.service';
+=======
+import { CommonModule } from '@angular/common';
+>>>>>>> 9e5c6dc834bc0a38655557944517bd879b49b812
 
 @Component({
   selector: 'app-menu',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './menu.html',
+<<<<<<< HEAD
   styleUrl: './menu.sass'
+=======
+  imports: [CommonModule],
+  styleUrls: ['./menu.sass'],
+>>>>>>> 9e5c6dc834bc0a38655557944517bd879b49b812
 })
 export class Menu implements OnInit {
   menuItems: any[] = [];
@@ -26,6 +35,7 @@ export class Menu implements OnInit {
   }
 
   ngOnInit() {
+<<<<<<< HEAD
     this.restaurantId = this.route.snapshot.paramMap.get('id');
     
     if (this.restaurantId) {
@@ -38,5 +48,16 @@ export class Menu implements OnInit {
         error: (err) => console.error('Ошибка загрузки меню:', err)
       });
     }
+=======
+    this.restaurantId = Number(this.route.snapshot.paramMap.get('id'));
+
+    this.api.getFoods(this.restaurantId).subscribe((data: any) => {
+      this.foods = data;
+    });
+  }
+
+  addToCart(food: any) {
+    console.log("Added:", food);
+>>>>>>> 9e5c6dc834bc0a38655557944517bd879b49b812
   }
 }
