@@ -1,31 +1,42 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // 1. Добавь импорт
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ApiService } from '../api.service';
+import { CartService } from '../cart.service';
 
 @Component({
   selector: 'app-menu',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './menu.html',
-  styleUrls: ['./menu.sass'],
+  styleUrl: './menu.sass'
 })
 export class Menu implements OnInit {
-
-  foods: any[] = [];
-  restaurantId!: number;
+  menuItems: any[] = [];
+  restaurantId: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
-    private api: ApiService
+    private api: ApiService,
+    private cdr: ChangeDetectorRef ,
+    public cartService: CartService
   ) {}
-
-  ngOnInit() {
-    this.restaurantId = Number(this.route.snapshot.paramMap.get('id'));
-
-    this.api.getFood(this.restaurantId).subscribe((data: any) => {
-      this.foods = data;
-    });
+  addToCart(item: any) {
+    this.cartService.addToCart(item);
   }
 
-  addToCart(food: any) {
-    console.log("Added:", food);
+  ngOnInit() {
+    this.restaurantId = this.route.snapshot.paramMap.get('id');
+    
+    if (this.restaurantId) {
+      this.api.getFoods(this.restaurantId).subscribe({
+        next: (data: any) => {
+          console.log('Блюда загружены:', data);
+          this.menuItems = data;
+          this.cdr.detectChanges(); 
+        },
+        error: (err) => console.error('Ошибка загрузки меню:', err)
+      });
+    }
   }
 }

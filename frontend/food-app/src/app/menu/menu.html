@@ -1,10 +1,27 @@
-<h2>Menu</h2>
+<div class="container" style="padding: 20px;">
+  <div *ngIf="cartService.items.length > 0" style="background: #eef9f1; border: 1px solid #27ae60; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between;">
+    <span>🛍 В корзине товаров: <b>{{ cartService.items.length }}</b></span>
+    <span>Итого: <b>{{ cartService.getTotalPrice() }} ₸</b></span>
+  </div>
 
-<div *ngFor="let f of foods">
-  <h3>{{ f.name }}</h3>
-  <p>{{ f.price }} ₸</p>
+  <div class="grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+    <div *ngFor="let item of menuItems" style="border: 1px solid #ddd; border-radius: 10px; padding: 15px;">
+      
+      <img [src]="item.image ? (item.image.startsWith('http') ? item.image : 'http://127.0.0.1:8000' + item.image) : 'assets/no-image.png'" 
+           style="width: 100%; height: 150px; object-fit: cover; border-radius: 5px;">
 
-  <button (click)="addToCart(f)">
-    Add to cart
-  </button>
+      <h3>{{ item.name }}</h3>
+      
+      <p style="color: #666; font-size: 0.9em; min-height: 40px;">
+        {{ item.description || 'Описание скоро появится...' }}
+      </p>
+
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <b style="color: #2c3e50;">{{ item.price }} ₸</b>
+        <button (click)="addToCart(item)" style="background: #27ae60; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer;">
+          Заказать
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
