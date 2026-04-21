@@ -23,14 +23,14 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     
-    # My apps
-    "food",
+    # Project apps
     "api",
+    "food",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "corsheaders.middleware.CorsMiddleware",  # Должен быть вверху
+    "corsheaders.middleware.CorsMiddleware",  
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
