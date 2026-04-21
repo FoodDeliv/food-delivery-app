@@ -2,7 +2,9 @@ import { Routes } from '@angular/router';
 import { Restaurants } from './restaurants/restaurants';
 import { LoginComponent } from './login/login';
 import { SearchResultsComponent } from './search-results/search-results';
-import { RestaurantMenuComponent } from './restaurant-menu/restaurant-menu';
+// Удали старый RestaurantMenuComponent, если он тебе не нужен
+// Импортируй СВОЙ класс Menu
+import { Menu } from './menu/menu'; 
 import { OrderComponent } from './order/order.component';
 import { CartComponent } from './cart/cart.component';
 import { HistoryComponent } from './history/history.component';
@@ -10,7 +12,8 @@ import { HistoryComponent } from './history/history.component';
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'restaurants', component: Restaurants },
-  { path: 'menu/:id', component: RestaurantMenuComponent },
+  // ИСПРАВЛЕНО: Теперь путь ведет на твой обновленный компонент
+  { path: 'menu/:id', component: Menu }, 
   { path: 'search', component: SearchResultsComponent },
   { path: 'order', component: OrderComponent },
   { path: 'cart', component: CartComponent },

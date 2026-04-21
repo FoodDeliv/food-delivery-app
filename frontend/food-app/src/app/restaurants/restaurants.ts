@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // Добавили ChangeDetectorRef
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ApiService } from '../api.service';
@@ -13,53 +13,54 @@ import { CartService } from '../cart.service';
 })
 export class Restaurants implements OnInit {
   restaurants: any[] = [];
-  allFoods: any[] = []; 
-  userName: string = 'Друг'; // Имя по умолчанию
+  userName: string = 'Друг';
+  foods: any[] = [];
+  allFoods: any[] = [];
 
   constructor(
     private api: ApiService, 
     private router: Router,
-    private cdr: ChangeDetectorRef,
-    private cartService: CartService 
+    private cartService: CartService,
+    private cdr: ChangeDetectorRef // Помогает Angular увидеть изменения
   ) {}
 
   ngOnInit() {
-    // 1. Получаем имя пользователя из localStorage
-    // Убедись, что при логине ты сохраняешь его как localStorage.setItem('user_name', name)
-    const savedName = localStorage.getItem('user_name');
-    if (savedName) {
-      this.userName = savedName;
-    }
+    // Используем автодетектор для имени пользователя
+    this.api.isLoggedIn$.subscribe(() => {
+      this.userName = this.api.getUserName();
+      this.cdr.detectChanges();
+    });
 
     this.loadInitialData();
   }
 
   private loadInitialData() {
-    // 2. Загружаем список ресторанов
+    // 1. Загружаем список ресторанов
     this.api.getRestaurants().subscribe({
       next: (data: any) => {
+        console.log('Рестораны получены:', data);
         this.restaurants = data;
-        this.cdr.detectChanges();
+        this.cdr.detectChanges(); // Принудительно обновляем UI
       },
-      error: (err) => console.error('Ошибка при получении ресторанов:', err)
+      error: (err) => {
+        console.error('Ошибка при получении ресторанов:', err);
+        // Если токен протух, ApiService.logout() сработает внутри перехватчика (если добавили)
+      }
     });
 
-    // 3. Загружаем все товары для витрины
-    this.api.getFoods('').subscribe({ 
-      next: (data: any) => {
-        this.allFoods = data;
-        this.cdr.detectChanges();
-      },
-      error: (err) => console.error('Ошибка при получении товаров:', err)
-    });
+    // 2. УДАЛЕНО: жесткая привязка к id = '123'
+    // На главной странице обычно не загружают еду конкретного ресторана без выбора.
+    // Если вам нужны "Популярные блюда", для этого нужен отдельный метод в API.
   }
 
   openMenu(id: number) {
-    this.router.navigate(['/menu', id]);
+    if (id) {
+      this.router.navigate(['/menu', id]);
+    }
   }
 
   addToCart(food: any) {
     this.cartService.addToCart(food);
-    // Можно добавить уведомление здесь, если хочешь
+    alert(`${food.name} добавлен в корзину!`);
   }
 }

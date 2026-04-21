@@ -6,6 +6,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.db.models import Q
+from orders.models import Cart, CartItem
+from food.models import FoodItem
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])

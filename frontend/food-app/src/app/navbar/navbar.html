@@ -43,6 +43,11 @@
     </div>
 
     <div class="navbar-right">
+      <div class="cart-control" (click)="router.navigate(['/cart'])" style="cursor: pointer; display: flex; align-items: center; margin-right: 20px;">
+        <span style="font-size: 20px; margin-right: 5px;">🛒</span>
+        <span style="font-weight: 500; color: #333;">{{ translation.translate('cart') || 'Cart' }}</span>
+        
+        </div>
       <div class="lang-selector">
         <span class="lang-icon">🌐</span>
         <select class="lang-select" (change)="onLangChange($event)" [value]="translation.currentLangValue">
@@ -52,11 +57,19 @@
         </select>
       </div>
 
-      <div class="user-controls" *ngIf="isLoggedIn()">
+      <div class="user-controls" *ngIf="isLoggedIn">
+        <span class="user-name" style="margin-right: 10px;">{{ userName }}</span>
         <button class="logout-btn" (click)="logout()">
           <span>{{ translation.translate('sign_out') }}</span>
         </button>
       </div>
+
+      <div class="user-controls" *ngIf="!isLoggedIn">
+        <button class="login-btn" (click)="router.navigate(['/login'])">
+          <span>{{ translation.translate('sign_in') || 'Sign In' }}</span>
+        </button>
+      </div>
+
     </div>
   </div>
 </nav>

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { ApiService } from '../api.service';
 
 @Component({
   selector: 'app-cart',
@@ -12,107 +13,60 @@ import { HttpClient } from '@angular/common/http';
 export class CartComponent implements OnInit {
   orders: any[] = [];
   selectedItems: number[] = [];
+  // Используем прямой URL, так как в ApiService переменные скрыты (private)
+  private readonly baseUrl = 'http://127.0.0.1:8000/api/';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private api: ApiService
+  ) {}
 
   ngOnInit(): void {
     this.loadOrders();
   }
 
+  // Получаем заголовки с токеном авторизации
+  private getOptions() {
+    const token = localStorage.getItem('access_token');
+    return {
+      headers: new HttpHeaders({
+        'Authorization': `Bearer ${token}`
+      })
+    };
+  }
+
   loadOrders(): void {
-    this.http.get<any[]>('http://127.0.0.1:8000/api/orders/').subscribe({
+    this.http.get<any[]>(`${this.baseUrl}orders/`, this.getOptions()).subscribe({
       next: (data) => {
+        // Оставляем только те заказы, где есть товары (активная корзина)
         this.orders = data.filter(order => order.items && order.items.length > 0);
         this.selectedItems = [];
       },
-      error: (error) => {
-        console.error('Load orders error:', error);
-      }
+      error: (error) => console.error('Ошибка загрузки корзины:', error)
     });
   }
 
+  // --- Управление количеством ---
   increaseQuantity(itemId: number): void {
-    this.http.post('http://127.0.0.1:8000/api/cart/update-quantity/', {
-      item_id: itemId,
-      action: 'increase'
-    }).subscribe({
-      next: () => {
-        this.loadOrders();
-      },
-      error: (error) => {
-        console.error('Increase quantity error:', error);
-      }
-    });
+    this.cartAction('update-quantity', { item_id: itemId, action: 'increase' });
   }
 
   decreaseQuantity(itemId: number): void {
-    this.http.post('http://127.0.0.1:8000/api/cart/update-quantity/', {
-      item_id: itemId,
-      action: 'decrease'
-    }).subscribe({
-      next: () => {
-        this.loadOrders();
-      },
-      error: (error) => {
-        console.error('Decrease quantity error:', error);
-      }
-    });
+    this.cartAction('update-quantity', { item_id: itemId, action: 'decrease' });
   }
 
   removeItem(itemId: number): void {
-    this.http.post('http://127.0.0.1:8000/api/cart/remove/', {
-      item_id: itemId
-    }).subscribe({
-      next: () => {
-        this.loadOrders();
-      },
-      error: (error) => {
-        console.error('Remove error:', error);
-      }
+    this.cartAction('remove', { item_id: itemId });
+  }
+
+  private cartAction(endpoint: string, body: any) {
+    this.http.post(`${this.baseUrl}cart/${endpoint}/`, body, this.getOptions()).subscribe({
+      next: () => this.loadOrders(),
+      error: (error) => console.error(`Ошибка ${endpoint}:`, error)
     });
   }
 
-  deleteSelected(): void {
-    if (this.selectedItems.length === 0) {
-      alert('Please select items first');
-      return;
-    }
-
-    this.http.post('http://127.0.0.1:8000/api/cart/delete-selected/', {
-      item_ids: this.selectedItems
-    }).subscribe({
-      next: () => {
-        this.loadOrders();
-      },
-      error: (error) => {
-        console.error('Delete selected error:', error);
-      }
-    });
-  }
-
-  clearCart(): void {
-    this.http.post('http://127.0.0.1:8000/api/cart/clear/', {}).subscribe({
-      next: () => {
-        this.loadOrders();
-      },
-      error: (error) => {
-        console.error('Clear cart error:', error);
-      }
-    });
-  }
-
-  checkout(): void {
-    this.http.post('http://127.0.0.1:8000/api/cart/checkout/', {}).subscribe({
-      next: () => {
-        alert('Order completed');
-        this.loadOrders();
-      },
-      error: (error) => {
-        console.error('Checkout error:', error);
-      }
-    });
-  }
-
+  // --- Логика выбора (Selection) ---
   toggleItemSelection(itemId: number): void {
     if (this.selectedItems.includes(itemId)) {
       this.selectedItems = this.selectedItems.filter(id => id !== itemId);
@@ -125,28 +79,40 @@ export class CartComponent implements OnInit {
     return this.selectedItems.includes(itemId);
   }
 
-  selectAllItems(): void {
-    const allItemIds = this.orders.flatMap(order => order.items.map((item: any) => item.id));
-    this.selectedItems = [...allItemIds];
+  getSelectedCount(): number {
+    return this.selectedItems.length;
   }
 
-  clearSelection(): void {
-    this.selectedItems = [];
-  }
-
-  areAllItemsSelected(): boolean {
-    const allItemIds = this.orders.flatMap(order => order.items.map((item: any) => item.id));
-    return allItemIds.length > 0 && allItemIds.every((id: number) => this.selectedItems.includes(id));
-  }
-
+  // --- Выбрать всё / Снять выделение ---
   toggleSelectAll(): void {
     if (this.areAllItemsSelected()) {
-      this.clearSelection();
+      this.selectedItems = [];
     } else {
-      this.selectAllItems();
+      const allIds: number[] = [];
+      this.orders.forEach(order => {
+        order.items.forEach((item: any) => allIds.push(item.id));
+      });
+      this.selectedItems = allIds;
     }
   }
 
+  areAllItemsSelected(): boolean {
+    const allIds: number[] = [];
+    this.orders.forEach(order => {
+      order.items.forEach((item: any) => allIds.push(item.id));
+    });
+    return allIds.length > 0 && allIds.every(id => this.selectedItems.includes(id));
+  }
+
+  deleteSelected(): void {
+    if (this.selectedItems.length === 0) return;
+    this.http.post(`${this.baseUrl}cart/delete-selected/`, { item_ids: this.selectedItems }, this.getOptions()).subscribe({
+      next: () => this.loadOrders(),
+      error: (error) => console.error('Ошибка удаления выбранных:', error)
+    });
+  }
+
+  // --- Итоги и оформление ---
   getTotalItems(order: any): number {
     return order.items.reduce((sum: number, item: any) => sum + item.quantity, 0);
   }
@@ -155,7 +121,20 @@ export class CartComponent implements OnInit {
     return order.items.reduce((sum: number, item: any) => sum + (item.food_price * item.quantity), 0);
   }
 
-  getSelectedCount(): number {
-    return this.selectedItems.length;
+  clearCart(): void {
+    this.http.post(`${this.baseUrl}cart/clear/`, {}, this.getOptions()).subscribe({
+      next: () => this.loadOrders(),
+      error: (error) => console.error('Ошибка очистки:', error)
+    });
+  }
+
+  checkout(): void {
+    this.http.post(`${this.baseUrl}cart/checkout/`, {}, this.getOptions()).subscribe({
+      next: () => {
+        alert('Заказ успешно оформлен! Проверьте историю заказов.');
+        this.loadOrders();
+      },
+      error: (error) => alert('Ошибка при оформлении заказа')
+    });
   }
 }

@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -8,7 +9,6 @@ SECRET_KEY = "django-insecure-v8n4%oarf#^9srpsgbtrw$7#!1p1^vagzjm6$0lzsa8$e+3nc-
 DEBUG = True
 ALLOWED_HOSTS = []
 
-# ✅ APPS (объединено)
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -16,19 +16,16 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-    # third-party
+    'orders',
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
     "django_filters",
 
-    # your apps
     "food",
     "api",
 ]
 
-# ✅ MIDDLEWARE (объединено)
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -40,7 +37,12 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# ✅ CORS (твоя часть)
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1), # Теперь токен живет целый день
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'AUTH_HEADER_TYPES': ('Bearer', 'JWT'), # Разрешаем оба типа заголовков
+}
+
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 

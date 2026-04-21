@@ -1,13 +1,17 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router'; 
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
   private rootUrl = 'http://127.0.0.1:8000/api/';
+
+  // Наш "радиопередатчик" статуса
+  private isLoggedInSubject = new BehaviorSubject<boolean>(!!localStorage.getItem('access_token'));
+  isLoggedIn$ = this.isLoggedInSubject.asObservable();
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -20,10 +24,8 @@ export class ApiService {
       tap((res: any) => {
         if (res.access) {
           localStorage.setItem('access_token', res.access);
-        }
-        // ИСПРАВЛЕНО: бэкенд теперь возвращает username напрямую
-        if (res.username) {
-          localStorage.setItem('user_name', res.username);
+          localStorage.setItem('user_name', res.username || 'Пользователь');
+          this.isLoggedInSubject.next(true); // Сообщаем всем: мы вошли!
         }
       })
     );
@@ -32,6 +34,7 @@ export class ApiService {
   logout(): void {
     localStorage.removeItem('access_token');
     localStorage.removeItem('user_name');
+    this.isLoggedInSubject.next(false); // Сообщаем всем: мы вышли!
     this.router.navigate(['/login']);
   }
 
@@ -43,15 +46,17 @@ export class ApiService {
     return localStorage.getItem('user_name') || 'Друг';
   }
 
-  isLoggedIn(): boolean {
-    return !!this.getToken();
-  }
-
   getRestaurants(): Observable<any> {
-    return this.http.get(`${this.rootUrl}food/restaurants/`);
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.getToken()}`
+    });
+    return this.http.get(`${this.rootUrl}food/restaurants/`, { headers });
   }
 
   getFoods(restaurantId: string | number): Observable<any> {
-    return this.http.get(`${this.rootUrl}food/restaurants/${restaurantId}/foods/`);
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.getToken()}`
+    });
+    return this.http.get(`${this.rootUrl}food/restaurants/${restaurantId}/foods/`, { headers });
   }
 }
