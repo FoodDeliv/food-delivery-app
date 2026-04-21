@@ -1,31 +1,31 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // Добавили импорт
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { ApiService } from '../api.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css']
 })
 export class CartComponent implements OnInit {
-  orders: any[] = [];
+  cartItems: any[] = [];
+  totalPrice: number = 0;
   selectedItems: number[] = [];
-  // Используем прямой URL, так как в ApiService переменные скрыты (private)
-  private readonly baseUrl = 'http://127.0.0.1:8000/api/';
+  
+  private readonly baseUrl = 'http://127.0.0.1:8000/api/auth/';
 
   constructor(
     private http: HttpClient,
-    private api: ApiService
+    private cd: ChangeDetectorRef // Добавили в конструктор
   ) {}
 
   ngOnInit(): void {
-    this.loadOrders();
+    this.loadCart();
   }
 
-  // Получаем заголовки с токеном авторизации
   private getOptions() {
     const token = localStorage.getItem('access_token');
     return {
@@ -35,106 +35,42 @@ export class CartComponent implements OnInit {
     };
   }
 
-  loadOrders(): void {
-    this.http.get<any[]>(`${this.baseUrl}orders/`, this.getOptions()).subscribe({
+  loadCart(): void {
+    const options = this.getOptions();
+    
+    this.http.get<any>(`${this.baseUrl}cart/`, options).subscribe({
       next: (data) => {
-        // Оставляем только те заказы, где есть товары (активная корзина)
-        this.orders = data.filter(order => order.items && order.items.length > 0);
-        this.selectedItems = [];
+        console.log('ЧТО ПРИШЛО ИЗ DJANGO:', data);
+        this.cartItems = data.items || []; 
+        this.totalPrice = data.total_price || 0;
+        
+        // ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ЭКРАНА
+        this.cd.detectChanges(); 
       },
-      error: (error) => console.error('Ошибка загрузки корзины:', error)
+      error: (err) => {
+        console.error('ОШИБКА ЗАГРУЗКИ:', err);
+      }
     });
-  }
-
-  // --- Управление количеством ---
-  increaseQuantity(itemId: number): void {
-    this.cartAction('update-quantity', { item_id: itemId, action: 'increase' });
-  }
-
-  decreaseQuantity(itemId: number): void {
-    this.cartAction('update-quantity', { item_id: itemId, action: 'decrease' });
   }
 
   removeItem(itemId: number): void {
-    this.cartAction('remove', { item_id: itemId });
-  }
-
-  private cartAction(endpoint: string, body: any) {
-    this.http.post(`${this.baseUrl}cart/${endpoint}/`, body, this.getOptions()).subscribe({
-      next: () => this.loadOrders(),
-      error: (error) => console.error(`Ошибка ${endpoint}:`, error)
-    });
-  }
-
-  // --- Логика выбора (Selection) ---
-  toggleItemSelection(itemId: number): void {
-    if (this.selectedItems.includes(itemId)) {
-      this.selectedItems = this.selectedItems.filter(id => id !== itemId);
-    } else {
-      this.selectedItems = [...this.selectedItems, itemId];
-    }
-  }
-
-  isItemSelected(itemId: number): boolean {
-    return this.selectedItems.includes(itemId);
-  }
-
-  getSelectedCount(): number {
-    return this.selectedItems.length;
-  }
-
-  // --- Выбрать всё / Снять выделение ---
-  toggleSelectAll(): void {
-    if (this.areAllItemsSelected()) {
-      this.selectedItems = [];
-    } else {
-      const allIds: number[] = [];
-      this.orders.forEach(order => {
-        order.items.forEach((item: any) => allIds.push(item.id));
+    if (confirm('Удалить этот товар из корзины?')) {
+      this.http.post(`${this.baseUrl}cart/remove/`, { item_id: itemId }, this.getOptions()).subscribe({
+        next: () => this.loadCart(),
+        error: (err) => console.error('Ошибка удаления:', err)
       });
-      this.selectedItems = allIds;
     }
-  }
-
-  areAllItemsSelected(): boolean {
-    const allIds: number[] = [];
-    this.orders.forEach(order => {
-      order.items.forEach((item: any) => allIds.push(item.id));
-    });
-    return allIds.length > 0 && allIds.every(id => this.selectedItems.includes(id));
-  }
-
-  deleteSelected(): void {
-    if (this.selectedItems.length === 0) return;
-    this.http.post(`${this.baseUrl}cart/delete-selected/`, { item_ids: this.selectedItems }, this.getOptions()).subscribe({
-      next: () => this.loadOrders(),
-      error: (error) => console.error('Ошибка удаления выбранных:', error)
-    });
-  }
-
-  // --- Итоги и оформление ---
-  getTotalItems(order: any): number {
-    return order.items.reduce((sum: number, item: any) => sum + item.quantity, 0);
-  }
-
-  getTotalPrice(order: any): number {
-    return order.items.reduce((sum: number, item: any) => sum + (item.food_price * item.quantity), 0);
-  }
-
-  clearCart(): void {
-    this.http.post(`${this.baseUrl}cart/clear/`, {}, this.getOptions()).subscribe({
-      next: () => this.loadOrders(),
-      error: (error) => console.error('Ошибка очистки:', error)
-    });
   }
 
   checkout(): void {
+    if (this.cartItems.length === 0) return;
+    
     this.http.post(`${this.baseUrl}cart/checkout/`, {}, this.getOptions()).subscribe({
       next: () => {
-        alert('Заказ успешно оформлен! Проверьте историю заказов.');
-        this.loadOrders();
+        alert('Заказ успешно оформлен!');
+        this.loadCart();
       },
-      error: (error) => alert('Ошибка при оформлении заказа')
+      error: (err) => alert('Ошибка при оформлении заказа')
     });
   }
 }
